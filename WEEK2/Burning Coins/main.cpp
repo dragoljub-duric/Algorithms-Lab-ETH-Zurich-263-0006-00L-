@@ -2,46 +2,51 @@
 using namespace std;
 int t, n;
 vector<int> vec;
-vector<vector<int>> memo1; vector<vector<int>> memo2; vector<vector<int>> move1; vector<vector<int>> move2;
+vector<vector<int>> memo; vector<vector<int>> mv;
 
-int dp(int l, int r, int p){
+int dp(int l, int r);
+
+void next_position(int l, int r, int m, int& new_l, int& new_r){
+    new_l = l + (1 - m), new_r = r - m;
+    dp(new_l, new_r);
+    int opponent = mv[new_l][new_r];
+    new_l = new_l + (1 - opponent);
+    new_r = new_r - opponent;
+}
+
+int dp(int l, int r){
     if(l > r) return 0;
-    vector<vector<int>>& m1 = p == 0 ? memo1 : memo2; 
-    if(m1[l][r] != -1) return m1[l][r];
-    vector<vector<int>>& mv1 = p == 0 ? move1 : move2; 
-    vector<vector<int>>& mv2 = p == 0 ? move2 : move1;
+    if(memo[l][r] != -1) return memo[l][r];
+    int new_l, new_r;
     //take left
-    dp(l + 1, r, (p + 1) % 2);
-    int opponent = mv2[l+1][r];
-    int new_l = l + 1 + (1 - opponent), new_r = r - opponent;
-    int sum_left = vec[l] + dp(new_l, new_r, p);
+    next_position(l, r, 0, new_l, new_r);
+    int sum_left = vec[l] + dp(new_l, new_r);
     //take right
-    dp(l, r - 1, (p + 1) % 2);
-    opponent = mv2[l][r-1];
-    new_l = l + (1 - opponent); new_r = r - 1 - opponent;
-    int sum_right = vec[r] + dp(new_l, new_r, p);
+    next_position(l, r, 1, new_l, new_r);
+    int sum_right = vec[r] + dp(new_l, new_r);
     //choose move
     if(sum_left > sum_right){
-        mv1[l][r] = 0;
-        return m1[l][r] = sum_left;
+        mv[l][r] = 0;
+        return memo[l][r] = sum_left;
     }
-    mv1[l][r] = 1;
-    return m1[l][r] = sum_right;
+    mv[l][r] = 1;
+    return memo[l][r] = sum_right;
 }
 
 int main(){
     scanf("%d",&t);
     while(t--){
         scanf("%d",&n);
-        vec = vector<int>(n); memo1 = vector<vector<int>>(n, vector<int>(n, -1)); memo2 = vector<vector<int>>(n, vector<int>(n, -1));
-        move1 = vector<vector<int>>(n, vector<int>(n, -1)); move2 = vector<vector<int>>(n, vector<int>(n, -1));
+        vec = vector<int>(n); 
+        memo = vector<vector<int>>(n, vector<int>(n, -1));
+        mv = vector<vector<int>>(n, vector<int>(n, -1));
         for(int i = 0; i < n; ++i){
             scanf("%d",&vec[i]);
-            memo1[i][i] = memo2[i][i] = vec[i]; 
-            move1[i][i] = move2[i][i] = 0;
+            memo[i][i] = vec[i]; 
+            mv[i][i] = 0;
         }
-        dp(0, n-1, 0);
-        printf("%d\n",memo1[0][n-1]);
+        dp(0, n-1);
+        printf("%d\n",memo[0][n-1]);
     }
     return 0;
 }
