@@ -34,7 +34,7 @@ int main(){
         for(int i = 0; i < n; ++i) scanf("%d", &vec[i]);
         for(int i = 0; i <= n; ++i) memo[0][i] = 0; for(int i = 1; i <= m; ++i) memo[i][n] = INC;
         int sum = 0, i = 0, j = 0;
-        while(i < n && j < n){
+        while(j < n){
             while(sum < k && j < n) sum += vec[j++];
             while(sum > k) sum -= vec[i++];
             if(sum == k)  seg.push_back(make_pair(i, j - 1)), sum -= vec[i++];
