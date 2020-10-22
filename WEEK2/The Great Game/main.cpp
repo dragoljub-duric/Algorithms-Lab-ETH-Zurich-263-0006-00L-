@@ -29,7 +29,7 @@ int main(){
         memo = vector<vector<int>>(n, vector<int>(2, -1)); memo[n-1][0] = memo[n - 1][1] = 0;
         int black = dp(b - 1, 0);
         if(red - black != 0) printf("%d\n", red > black);
-        else printf("%d\n", (red + black) % 4 == 0 || (red + black) % 4 == 3);
+        else printf("%d\n", (red + black) % 4 == 0);
     }
     return 0;
 }
