@@ -17,14 +17,12 @@ bool check(std::vector<std::string> a, std::vector<std::string> b, int f){
     return count > f;
 }
 
-bool perfect_matching(const graph& G, int n){
-    std::map<vertex_desc, vertex_desc> match;
-    boost::associative_property_map<std::map<vertex_desc, vertex_desc>> mapAdapter(match);
-    boost::checked_edmonds_maximum_cardinality_matching(G, mapAdapter);
-    int count = 0;
-    for(std::pair<vertex_desc, vertex_desc> a : match)
-        if(a.second < n) ++count;
-    return count == n;
+bool perfect_matching(const graph& G){
+    int n = boost::num_vertices(G);
+    std::vector<vertex_desc> mate_map(n);
+    boost::edmonds_maximum_cardinality_matching(G, boost::make_iterator_property_map(mate_map.begin(), boost::get(boost::vertex_index, G)));
+    int matching_size = boost::matching_size(G, boost::make_iterator_property_map(mate_map.begin(), boost::get(boost::vertex_index, G)));
+    return matching_size == n/2;
 }
 
 int main(){
@@ -44,7 +42,7 @@ int main(){
                 if(check(vec[i], vec[k], f))
                     boost::add_edge(i, k, G);
         }
-        std::cout << (perfect_matching(G, n)? "not optimal" : "optimal") << "\n";
+        std::cout << (perfect_matching(G)? "not optimal" : "optimal") << "\n";
     }
     return 0;
 }
